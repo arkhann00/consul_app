@@ -1,0 +1,45 @@
+import '../../../core/api/api_client.dart';
+import '../../../core/api/phone_util.dart';
+import '../../../models/app_user.dart';
+import '../../../models/token_pair.dart';
+
+class AuthApi {
+  AuthApi(this._client);
+
+  final ApiClient _client;
+
+  Future<TokenPair> register({
+    required String name,
+    required String phone,
+    required String password,
+  }) async {
+    final res = await _client.post<Map<String, dynamic>>(
+      '/auth/register',
+      data: {
+        'name': name.trim(),
+        'phone': normalizePhone(phone),
+        'password': password,
+      },
+    );
+    return TokenPair.fromJson(res.data!);
+  }
+
+  Future<TokenPair> login({
+    required String phone,
+    required String password,
+  }) async {
+    final res = await _client.post<Map<String, dynamic>>(
+      '/auth/login',
+      data: {
+        'phone': normalizePhone(phone),
+        'password': password,
+      },
+    );
+    return TokenPair.fromJson(res.data!);
+  }
+
+  Future<AppUser> me() async {
+    final res = await _client.get<Map<String, dynamic>>('/auth/me');
+    return AppUser.fromJson(res.data!);
+  }
+}

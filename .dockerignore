@@ -1,0 +1,17 @@
+.git
+.gitignore
+.idea
+.vscode
+**/.dart_tool
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/build
+**/ios
+**/android
+**/macos
+**/windows
+**/linux
+**/*.iml
+.DS_Store
+*.log
+.env

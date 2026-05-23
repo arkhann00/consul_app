@@ -1,0 +1,9 @@
+services:
+  consul-web:
+    build:
+      context: .
+      args:
+        API_BASE_URL: ${API_BASE_URL:-http://5.42.113.18:8001}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped
