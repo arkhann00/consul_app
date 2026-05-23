@@ -7,5 +7,5 @@ services:
       args:
         API_BASE_URL: ${API_BASE_URL:-http://5.42.113.18:8001}
     ports:
-      - "${WEB_PORT:-8080}:80"
+      - "${WEB_PORT:-8083}:80"
     restart: unless-stopped
