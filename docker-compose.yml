@@ -2,6 +2,8 @@ services:
   consul-web:
     build:
       context: .
+      # dart2js needs more shared memory than Docker default (64 MB)
+      shm_size: "2gb"
       args:
         API_BASE_URL: ${API_BASE_URL:-http://5.42.113.18:8001}
     ports:
