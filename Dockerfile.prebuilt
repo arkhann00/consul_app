@@ -1,11 +1,19 @@
-# Use when Flutter web is already built on the host:
-#   flutter build web --release
-#   docker build -f Dockerfile.prebuilt -t consul-web .
+# Быстрый образ без сборки Flutter внутри Docker.
+# На хосте:
+#   flutter build web --release --no-wasm-dry-run --no-web-resources-cdn
+#   docker build -f Dockerfile.prebuilt -t consul-web:latest .
 FROM nginx:1.27-alpine
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY build/web /usr/share/nginx/html
 
+RUN test -f /usr/share/nginx/html/main.dart.js \
+    && grep -q 'consul_app.access_token' /usr/share/nginx/html/main.dart.js \
+    && ! grep -q 'generateKey' /usr/share/nginx/html/main.dart.js
+
 EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget -qO- http://127.0.0.1/ > /dev/null || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

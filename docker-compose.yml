@@ -2,10 +2,34 @@ services:
   consul-web:
     build:
       context: .
+      dockerfile: Dockerfile
       # dart2js needs more shared memory than Docker default (64 MB)
       shm_size: "2gb"
       args:
         API_BASE_URL: ${API_BASE_URL:-http://5.42.113.18:8001}
+        # O1 — faster build on weak VPS; O4 — default release optimization
+        DART2JS_OPTIMIZATION: ${DART2JS_OPTIMIZATION:-O4}
+    image: consul-web:latest
     ports:
       - "${WEB_PORT:-8083}:80"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    develop:
+      watch:
+        - action: rebuild
+          path: ./lib
+        - action: rebuild
+          path: ./assets
+        - action: rebuild
+          path: ./web
+        - action: rebuild
+          path: ./pubspec.yaml
+        - action: rebuild
+          path: ./pubspec.lock
+        - action: rebuild
+          path: ./Dockerfile
