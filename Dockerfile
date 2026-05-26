@@ -35,9 +35,10 @@ ARG API_BASE_URL=http://5.42.113.18:8001
 ARG DART2JS_OPTIMIZATION=O4
 RUN printf 'API_BASE_URL=%s\n' "$API_BASE_URL" > assets/app.env
 
+# Do not cache .dart_tool — stale web_plugin_registrant breaks builds after dependency changes
 RUN --mount=type=cache,target=/root/.pub-cache \
-    --mount=type=cache,target=/app/.dart_tool \
-    flutter pub get \
+    flutter clean \
+    && flutter pub get \
     && flutter build web --release \
         --no-wasm-dry-run \
         --no-web-resources-cdn \
