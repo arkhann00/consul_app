@@ -8,7 +8,7 @@ services:
       args:
         API_BASE_URL: ${API_BASE_URL:-http://5.42.113.18:8001}
         # O1 — faster build on weak VPS; O4 — default release optimization
-        DART2JS_OPTIMIZATION: ${DART2JS_OPTIMIZATION:-O4}
+        DART2JS_OPTIMIZATION: ${DART2JS_OPTIMIZATION:-O1}
     image: consul-web:latest
     ports:
       - "${WEB_PORT:-8083}:80"

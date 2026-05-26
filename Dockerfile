@@ -1,14 +1,10 @@
 # syntax=docker/dockerfile:1
 # Multi-stage: Flutter web build → nginx
 #
-# Rebuild & restart:
-#   docker compose up -d --build --force-recreate
+# Rebuild:
+#   docker compose build --no-cache && docker compose up -d --force-recreate
 #
-# Auto-rebuild on file changes (dev on server):
-#   docker compose watch
-#
-# Requires BuildKit (default in Docker Desktop / Docker 23+):
-#   DOCKER_BUILDKIT=1
+# Weak VPS (≤2 GB RAM): in .env set DART2JS_OPTIMIZATION=O1
 FROM ghcr.io/cirruslabs/flutter:3.41.5 AS build
 
 ENV CI=true \
@@ -21,34 +17,32 @@ RUN flutter config --enable-web --no-analytics \
     && flutter precache --web \
         --no-android --no-ios --no-linux --no-macos --no-windows
 
-# Dependencies layer — rebuilds only when pubspec changes
 COPY pubspec.yaml pubspec.lock analysis_options.yaml ./
-RUN --mount=type=cache,target=/root/.pub-cache \
-    flutter pub get
 
-# App sources — dart2js is CPU-heavy; expect 3–10+ min on small VPS
+# Fail fast if server repo is outdated
+RUN ! grep -q 'flutter_secure_storage' pubspec.yaml pubspec.lock
+
 COPY lib/ lib/
 COPY assets/ assets/
 COPY web/ web/
+COPY scripts/verify-web-build.sh scripts/verify-web-build.sh
 
 ARG API_BASE_URL=http://5.42.113.18:8001
-ARG DART2JS_OPTIMIZATION=O4
+ARG DART2JS_OPTIMIZATION=O1
 RUN printf 'API_BASE_URL=%s\n' "$API_BASE_URL" > assets/app.env
 
-# Do not cache .dart_tool — stale web_plugin_registrant breaks builds after dependency changes
+# Fresh plugin registrant on every build (no .dart_tool cache mount)
 RUN --mount=type=cache,target=/root/.pub-cache \
-    flutter clean \
+    rm -rf .dart_tool .flutter-plugins-dependencies build \
     && flutter pub get \
     && flutter build web --release \
         --no-wasm-dry-run \
         --no-web-resources-cdn \
         --dart2js-optimization="${DART2JS_OPTIMIZATION}" \
     && date -u +%Y-%m-%dT%H:%M:%SZ > build/web/build-id.txt \
-    && grep -q 'access_token' build/web/main.dart.js \
-    && ! grep -q 'generateKey' build/web/main.dart.js \
-    && ! grep -q 'FlutterSecureStorage' build/web/main.dart.js
+    && chmod +x scripts/verify-web-build.sh \
+    && ./scripts/verify-web-build.sh
 
-# Stage 2: serve static files
 FROM nginx:1.27-alpine
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
