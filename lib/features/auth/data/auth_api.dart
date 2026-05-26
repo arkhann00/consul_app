@@ -23,7 +23,11 @@ class AuthApi {
       },
     );
     return TokenPair.fromJson(
-      requireJsonMap(res.data, context: 'ответ регистрации'),
+      requireJsonMap(
+        res.data,
+        context: 'ответ регистрации',
+        statusCode: res.statusCode,
+      ),
     );
   }
 
@@ -39,14 +43,22 @@ class AuthApi {
       },
     );
     return TokenPair.fromJson(
-      requireJsonMap(res.data, context: 'ответ входа'),
+      requireJsonMap(
+        res.data,
+        context: 'ответ входа',
+        statusCode: res.statusCode,
+      ),
     );
   }
 
   Future<AppUser> me() async {
     final res = await _client.get<Map<String, dynamic>>('/auth/me');
     return AppUser.fromJson(
-      requireJsonMap(res.data, context: 'профиль пользователя'),
+      requireJsonMap(
+        res.data,
+        context: 'профиль пользователя',
+        statusCode: res.statusCode,
+      ),
     );
   }
 }

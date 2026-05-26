@@ -109,7 +109,11 @@ class ApiClient {
       options: Options(extra: {'skipAuth': true}),
     );
 
-    final data = requireJsonMap(response.data, context: 'ответ refresh');
+    final data = requireJsonMap(
+      response.data,
+      context: 'ответ refresh',
+      statusCode: response.statusCode,
+    );
 
     final access = data['access_token'] as String?;
     final newRefresh = data['refresh_token'] as String?;
