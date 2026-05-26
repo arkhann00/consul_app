@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../config/api_config.dart';
 import 'api_exception.dart';
+import 'json_map.dart';
 import 'token_storage.dart';
 
 class ApiClient {
@@ -108,10 +109,7 @@ class ApiClient {
       options: Options(extra: {'skipAuth': true}),
     );
 
-    final data = response.data;
-    if (data == null) {
-      throw ApiException(message: 'Пустой ответ сервера');
-    }
+    final data = requireJsonMap(response.data, context: 'ответ refresh');
 
     final access = data['access_token'] as String?;
     final newRefresh = data['refresh_token'] as String?;

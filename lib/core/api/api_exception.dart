@@ -21,6 +21,24 @@ class ApiException implements Exception {
     if (detail != null && detail.isNotEmpty) {
       return ApiException(statusCode: status, message: detail, rawDetail: data);
     }
+    if (e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      return ApiException(
+        statusCode: status,
+        message:
+            'Не удалось связаться с сервером. Проверьте API_BASE_URL и доступность API.',
+        rawDetail: data,
+      );
+    }
+    if (e.type == DioExceptionType.badResponse && status == null) {
+      return ApiException(
+        statusCode: status,
+        message:
+            'Запрос заблокирован браузером (CORS). На бэкенде разрешите origin сайта.',
+        rawDetail: data,
+      );
+    }
     return ApiException(
       statusCode: status,
       message: e.message ?? 'Сетевая ошибка',

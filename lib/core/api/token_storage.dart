@@ -1,31 +1,27 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'token_storage_delegate.dart';
+import 'token_storage_stub.dart'
+    if (dart.library.io) 'token_storage_io.dart'
+    if (dart.library.html) 'token_storage_web.dart';
 
 class TokenStorage {
-  TokenStorage({FlutterSecureStorage? storage})
-      : _storage = storage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
-            );
+  TokenStorage({TokenStorageDelegate? delegate})
+      : _delegate = delegate ?? createTokenStorageDelegate();
 
-  static const _accessKey = 'access_token';
-  static const _refreshKey = 'refresh_token';
+  final TokenStorageDelegate _delegate;
 
-  final FlutterSecureStorage _storage;
+  Future<String?> readAccessToken() => _delegate.readAccessToken();
 
-  Future<String?> readAccessToken() => _storage.read(key: _accessKey);
-
-  Future<String?> readRefreshToken() => _storage.read(key: _refreshKey);
+  Future<String?> readRefreshToken() => _delegate.readRefreshToken();
 
   Future<void> saveTokens({
     required String accessToken,
     required String refreshToken,
-  }) async {
-    await _storage.write(key: _accessKey, value: accessToken);
-    await _storage.write(key: _refreshKey, value: refreshToken);
+  }) {
+    return _delegate.saveTokens(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
   }
 
-  Future<void> clear() async {
-    await _storage.delete(key: _accessKey);
-    await _storage.delete(key: _refreshKey);
-  }
+  Future<void> clear() => _delegate.clear();
 }

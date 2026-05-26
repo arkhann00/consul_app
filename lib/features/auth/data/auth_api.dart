@@ -1,4 +1,5 @@
 import '../../../core/api/api_client.dart';
+import '../../../core/api/json_map.dart';
 import '../../../core/api/phone_util.dart';
 import '../../../models/app_user.dart';
 import '../../../models/token_pair.dart';
@@ -21,7 +22,9 @@ class AuthApi {
         'password': password,
       },
     );
-    return TokenPair.fromJson(res.data!);
+    return TokenPair.fromJson(
+      requireJsonMap(res.data, context: 'ответ регистрации'),
+    );
   }
 
   Future<TokenPair> login({
@@ -35,11 +38,15 @@ class AuthApi {
         'password': password,
       },
     );
-    return TokenPair.fromJson(res.data!);
+    return TokenPair.fromJson(
+      requireJsonMap(res.data, context: 'ответ входа'),
+    );
   }
 
   Future<AppUser> me() async {
     final res = await _client.get<Map<String, dynamic>>('/auth/me');
-    return AppUser.fromJson(res.data!);
+    return AppUser.fromJson(
+      requireJsonMap(res.data, context: 'профиль пользователя'),
+    );
   }
 }
