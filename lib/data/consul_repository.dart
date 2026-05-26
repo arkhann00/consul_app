@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../core/api/api_client.dart';
 import '../core/api/api_exception.dart';
+import '../core/api/auth_debug.dart';
 import '../core/config/api_config.dart';
 import '../features/auth/data/auth_api.dart';
 import '../features/doctors/data/doctors_api.dart';
@@ -81,8 +82,11 @@ class ConsulRepository {
     required String phone,
     required String password,
   }) async {
+    logAuthStep('signInWithPhone: start');
     final tokens = await _auth.login(phone: phone, password: password);
+    logAuthStep('signInWithPhone: tokens received');
     await _saveTokens(tokens);
+    logAuthStep('signInWithPhone: tokens saved');
     isAuthenticated.value = true;
   }
 

@@ -43,8 +43,9 @@ RUN --mount=type=cache,target=/root/.pub-cache \
         --no-web-resources-cdn \
         --dart2js-optimization="${DART2JS_OPTIMIZATION}" \
     && date -u +%Y-%m-%dT%H:%M:%SZ > build/web/build-id.txt \
-    && grep -q 'consul_app.access_token' build/web/main.dart.js \
-    && ! grep -q 'generateKey' build/web/main.dart.js
+    && grep -q 'access_token' build/web/main.dart.js \
+    && ! grep -q 'generateKey' build/web/main.dart.js \
+    && ! grep -q 'FlutterSecureStorage' build/web/main.dart.js
 
 # Stage 2: serve static files
 FROM nginx:1.27-alpine

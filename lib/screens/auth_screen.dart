@@ -83,11 +83,11 @@ class _AuthScreenState extends State<AuthScreen> {
       return msg;
     }
     final text = e.toString();
-    if (text.contains('Null check operator used on a null value')) {
-      return 'Старая сборка сайта или CORS на API.\n'
-          '1) Пересоберите: flutter build web\n'
-          '2) На API разрешите origin сайта (не только :8001)\n'
-          '3) F12 → Console — строки [consul AUTH]';
+    if (text.contains('generateKey') || text.contains('Null check operator')) {
+      return 'Старая сборка сайта в Docker.\n'
+          'Выполните на сервере:\n'
+          'docker compose build --no-cache && docker compose up -d --force-recreate\n'
+          'Затем Ctrl+Shift+R в браузере';
     }
     return 'Ошибка: $text\nF12 → Console → [consul AUTH]';
   }
