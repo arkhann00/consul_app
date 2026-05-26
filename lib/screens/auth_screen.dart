@@ -60,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
         );
       }
     } catch (e, st) {
-      debugPrint('$e\n$st');
+      logAuthError(e, st);
       if (mounted) {
         setState(() => _errorText = _humanAuthError(e));
       }
@@ -82,7 +82,14 @@ class _AuthScreenState extends State<AuthScreen> {
       }
       return msg;
     }
-    return 'Ошибка: $e';
+    final text = e.toString();
+    if (text.contains('Null check operator used on a null value')) {
+      return 'Старая сборка сайта или CORS на API.\n'
+          '1) Пересоберите: flutter build web\n'
+          '2) На API разрешите origin сайта (не только :8001)\n'
+          '3) F12 → Console — строки [consul AUTH]';
+    }
+    return 'Ошибка: $text\nF12 → Console → [consul AUTH]';
   }
 
   @override
@@ -193,6 +200,15 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: _loading
                     ? const CupertinoActivityIndicator(color: DentistColors.white)
                     : Text(_segment == 0 ? 'Войти' : 'Зарегистрироваться'),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'API: ${ApiConfig.baseUrl}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                color: DentistColors.tertiaryText,
               ),
             ),
           ],

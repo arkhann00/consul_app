@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'core/api/api_exception.dart';
+import 'core/api/auth_debug.dart';
 import 'core/config/api_config.dart';
 import 'data/consul_repository.dart';
 import 'util/ru_date.dart';

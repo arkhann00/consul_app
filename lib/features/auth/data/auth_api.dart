@@ -1,4 +1,5 @@
 import '../../../core/api/api_client.dart';
+import '../../../core/api/auth_debug.dart';
 import '../../../core/api/json_map.dart';
 import '../../../core/api/phone_util.dart';
 import '../../../models/app_user.dart';
@@ -41,6 +42,9 @@ class AuthApi {
         'phone': normalizePhone(phone),
         'password': password,
       },
+    );
+    logAuthStep(
+      'login response: ${describeAuthResponse(statusCode: res.statusCode, data: res.data)}',
     );
     return TokenPair.fromJson(
       requireJsonMap(
